@@ -1,0 +1,43 @@
+name: Pact provider verification
+
+on:
+  pull_request:
+
+jobs:
+  pact:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-java@v4
+      with:
+        java-version: 21
+        distribution: corretto
+        cache: maven
+
+    - name: Run Pact provider verification and publish results to Pact Broker
+      env:
+        GIT_COMMIT: ${{ github.sha }}
+        GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
+      shell: sh
+      run: |
+        mvn verify \
+          -Dpact.tests.skip=false \
+          -Ddefault.tests.skip=true \
+          -Dpact.verifier.publishResults=true \
+          -Dpact.provider.version=$GIT_COMMIT \
+          -Dpact.provider.branch=$GIT_BRANCH \
+          -Dpactbroker.url=${{ secrets.PACT_BROKER_BASE_URL }} \
+          -Dpactbroker.auth.username=${{ secrets.PACT_BROKER_USERNAME }} \
+          -Dpactbroker.auth.password=${{ secrets.PACT_BROKER_PASSWORD }} \
+
+    - name: Contracts Report
+      uses: dorny/test-reporter@v2
+      if: success() || failure()
+      with:
+        name: Contract Tests
+        path: target/failsafe-reports/*.pact.*.xml
+        reporter: java-junit
