@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -63,7 +64,7 @@ public class VetRestController implements VetsApi {
     public ResponseEntity<VetDto> getVet(Integer vetId)  {
         Vet vet = this.clinicService.findVetById(vetId);
         if (vet == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NoSuchElementException("Vet with id " + vetId + " not found");
         }
         return new ResponseEntity<>(vetMapper.toVetDto(vet), HttpStatus.OK);
     }
@@ -85,7 +86,7 @@ public class VetRestController implements VetsApi {
     public ResponseEntity<VetDto> updateVet(Integer vetId,VetDto vetDto)  {
         Vet currentVet = this.clinicService.findVetById(vetId);
         if (currentVet == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NoSuchElementException("Vet with id " + vetId + " not found");
         }
         currentVet.setFirstName(vetDto.getFirstName());
         currentVet.setLastName(vetDto.getLastName());
@@ -107,7 +108,7 @@ public class VetRestController implements VetsApi {
     public ResponseEntity<VetDto> deleteVet(Integer vetId) {
         Vet vet = this.clinicService.findVetById(vetId);
         if (vet == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NoSuchElementException("Vet with id " + vetId + " not found");
         }
         VetDto vetDto = vetMapper.toVetDto(vet);
         this.clinicService.deleteVet(vet);
