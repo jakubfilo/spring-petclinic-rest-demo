@@ -1,0 +1,22 @@
+name: API Breaking Changes Detection
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  detect-breaking-changes:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - uses: oasdiff/oasdiff-action/breaking@v0.0.47
+      with:
+        base: 'origin/master:openapi/openapi.yaml'
+        revision: 'HEAD:openapi/openapi.yaml'
+        fail-on: WARN
+        err-ignore: './openapi/error-ignore.txt'
+        warn-ignore: './openapi/warning-ignore.txt'
