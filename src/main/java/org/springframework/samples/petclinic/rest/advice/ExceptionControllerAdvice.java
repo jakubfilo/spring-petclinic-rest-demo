@@ -19,6 +19,7 @@ package org.springframework.samples.petclinic.rest.advice;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.rest.controller.BindingErrorsResponse;
@@ -68,6 +70,16 @@ public class ExceptionControllerAdvice {
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("schemaValidationErrors", List.<ValidationMessageDto>of());
         return problemDetail;
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseBody
+    public ResponseEntity<ProblemDetail> handleNoSuchElementException(NoSuchElementException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ProblemDetail detail = this.detailBuild(e, status, request.getRequestURL(), e.getMessage());
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(detail);
     }
 
     /**
