@@ -155,7 +155,7 @@ class VisitRestControllerTests {
     	given(this.clinicService.findAllVisits()).willReturn(visits);
         this.mockMvc.perform(get("/api/visits")
         	.accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -168,7 +168,7 @@ class VisitRestControllerTests {
     	System.out.println("newVisitAsJSON " + newVisitAsJSON);
     	this.mockMvc.perform(post("/api/visits")
     		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-    		.andExpect(status().isCreated());
+    		.andExpect(status().isOk());
     }
 
     @Test
@@ -195,7 +195,7 @@ class VisitRestControllerTests {
     	this.mockMvc.perform(put("/api/visits/2")
     		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
         	.andExpect(content().contentType("application/json"))
-        	.andExpect(status().isNoContent());
+        	.andExpect(status().isOk());
 
     	this.mockMvc.perform(get("/api/visits/2")
            	.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -226,7 +226,7 @@ class VisitRestControllerTests {
     	given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));
     	this.mockMvc.perform(delete("/api/visits/2")
     		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-        	.andExpect(status().isNoContent());
+        	.andExpect(status().isOk());
     }
 
     @Test

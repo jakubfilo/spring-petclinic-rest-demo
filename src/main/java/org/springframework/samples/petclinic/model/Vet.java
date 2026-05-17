@@ -19,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.XmlElement;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.*;
 
 /**
@@ -31,7 +34,16 @@ import java.util.*;
  */
 @Entity
 @Table(name = "vets")
+@NoArgsConstructor
 public class Vet extends Person {
+
+    @Builder
+    public Vet(Integer id, String firstName, String lastName, Set<Specialty> specialties) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.specialties = specialties;
+    }
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),

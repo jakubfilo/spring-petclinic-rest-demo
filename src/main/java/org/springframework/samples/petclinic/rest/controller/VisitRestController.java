@@ -16,7 +16,6 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.mapper.VisitMapper;
@@ -27,7 +26,6 @@ import org.springframework.samples.petclinic.rest.dto.VisitFieldsDto;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -56,9 +54,6 @@ public class VisitRestController implements VisitsApi {
     @Override
     public ResponseEntity<List<VisitDto>> listVisits() {
         List<Visit> visits = new ArrayList<>(this.clinicService.findAllVisits());
-        if (visits.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(new ArrayList<>(visitMapper.toVisitsDto(visits)), HttpStatus.OK);
     }
 
@@ -75,12 +70,10 @@ public class VisitRestController implements VisitsApi {
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<VisitDto> addVisit(VisitDto visitDto) {
-        HttpHeaders headers = new HttpHeaders();
         Visit visit = visitMapper.toVisit(visitDto);
         this.clinicService.saveVisit(visit);
         visitDto = visitMapper.toVisitDto(visit);
-        headers.setLocation(UriComponentsBuilder.newInstance().path("/api/visits/{id}").buildAndExpand(visit.getId()).toUri());
-        return new ResponseEntity<>(visitDto, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(visitDto, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -93,7 +86,7 @@ public class VisitRestController implements VisitsApi {
         currentVisit.setDate(visitDto.getDate());
         currentVisit.setDescription(visitDto.getDescription());
         this.clinicService.saveVisit(currentVisit);
-        return new ResponseEntity<>(visitMapper.toVisitDto(currentVisit), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(visitMapper.toVisitDto(currentVisit), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -104,8 +97,9 @@ public class VisitRestController implements VisitsApi {
         if (visit == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        VisitDto visitDto = visitMapper.toVisitDto(visit);
         this.clinicService.deleteVisit(visit);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(visitDto, HttpStatus.OK);
     }
 
 }

@@ -133,7 +133,7 @@ class VetRestControllerTests {
     	given(this.clinicService.findAllVets()).willReturn(vets);
         this.mockMvc.perform(get("/api/vets")
         	.accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -145,7 +145,7 @@ class VetRestControllerTests {
         String newVetAsJSON = mapper.writeValueAsString(vetMapper.toVetDto(newVet));
     	this.mockMvc.perform(post("/api/vets")
     		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-    		.andExpect(status().isCreated());
+    		.andExpect(status().isOk());
     }
 
     @Test
@@ -172,7 +172,7 @@ class VetRestControllerTests {
     	this.mockMvc.perform(put("/api/vets/1")
     		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
         	.andExpect(content().contentType("application/json"))
-        	.andExpect(status().isNoContent());
+        	.andExpect(status().isOk());
 
     	this.mockMvc.perform(get("/api/vets/1")
            	.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -204,7 +204,7 @@ class VetRestControllerTests {
     	given(this.clinicService.findVetById(1)).willReturn(vets.get(0));
     	this.mockMvc.perform(delete("/api/vets/1")
     		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-        	.andExpect(status().isNoContent());
+        	.andExpect(status().isOk());
     }
 
     @Test

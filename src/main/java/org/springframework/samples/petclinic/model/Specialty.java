@@ -17,6 +17,8 @@ package org.springframework.samples.petclinic.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Models a {@link Vet Vet's} specialty (for example, dentistry).
@@ -25,6 +27,13 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "specialties")
+@NoArgsConstructor
 public class Specialty extends NamedEntity {
+
+    @Builder
+    public Specialty(Integer id, String name) {
+        this.id = id;
+        setName(name);
+    }
 
 }

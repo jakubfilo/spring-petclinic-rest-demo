@@ -16,7 +16,6 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.mapper.PetTypeMapper;
@@ -27,7 +26,6 @@ import org.springframework.samples.petclinic.rest.dto.PetTypeFieldsDto;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.transaction.Transactional;
 
@@ -52,9 +50,6 @@ public class PetTypeRestController implements PettypesApi {
     @Override
     public ResponseEntity<List<PetTypeDto>> listPetTypes() {
         List<PetType> petTypes = new ArrayList<>(this.clinicService.findAllPetTypes());
-        if (petTypes.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(petTypeMapper.toPetTypeDtos(petTypes), HttpStatus.OK);
     }
 
@@ -71,11 +66,9 @@ public class PetTypeRestController implements PettypesApi {
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
     @Override
     public ResponseEntity<PetTypeDto> addPetType(PetTypeFieldsDto petTypeFieldsDto) {
-        HttpHeaders headers = new HttpHeaders();
         final PetType type = petTypeMapper.toPetType(petTypeFieldsDto);
         this.clinicService.savePetType(type);
-        headers.setLocation(UriComponentsBuilder.newInstance().path("/api/pettypes/{id}").buildAndExpand(type.getId()).toUri());
-        return new ResponseEntity<>(petTypeMapper.toPetTypeDto(type), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(petTypeMapper.toPetTypeDto(type), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
@@ -87,7 +80,7 @@ public class PetTypeRestController implements PettypesApi {
         }
         currentPetType.setName(petTypeDto.getName());
         this.clinicService.savePetType(currentPetType);
-        return new ResponseEntity<>(petTypeMapper.toPetTypeDto(currentPetType), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(petTypeMapper.toPetTypeDto(currentPetType), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
@@ -98,8 +91,9 @@ public class PetTypeRestController implements PettypesApi {
         if (petType == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        PetTypeDto petTypeDto = petTypeMapper.toPetTypeDto(petType);
         this.clinicService.deletePetType(petType);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(petTypeDto, HttpStatus.OK);
     }
 
 }

@@ -15,7 +15,6 @@
  */
 package org.springframework.samples.petclinic.rest.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.mapper.SpecialtyMapper;
@@ -27,7 +26,6 @@ import org.springframework.samples.petclinic.rest.dto.VetDto;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -57,9 +55,6 @@ public class VetRestController implements VetsApi {
     @Override
     public ResponseEntity<List<VetDto>> listVets() {
         List<VetDto> vets = new ArrayList<>(vetMapper.toVetDtos(this.clinicService.findAllVets()));
-        if (vets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(vets, HttpStatus.OK);
     }
 
@@ -76,15 +71,13 @@ public class VetRestController implements VetsApi {
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
     @Override
     public ResponseEntity<VetDto> addVet(VetDto vetDto) {
-        HttpHeaders headers = new HttpHeaders();
         Vet vet = vetMapper.toVet(vetDto);
         if(vet.getNrOfSpecialties() > 0){
             List<Specialty> vetSpecialities = this.clinicService.findSpecialtiesByNameIn(vet.getSpecialties().stream().map(Specialty::getName).collect(Collectors.toSet()));
             vet.setSpecialties(vetSpecialities);
         }
         this.clinicService.saveVet(vet);
-        headers.setLocation(UriComponentsBuilder.newInstance().path("/api/vets/{id}").buildAndExpand(vet.getId()).toUri());
-        return new ResponseEntity<>(vetMapper.toVetDto(vet), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(vetMapper.toVetDto(vet), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
@@ -105,7 +98,7 @@ public class VetRestController implements VetsApi {
             currentVet.setSpecialties(vetSpecialities);
         }
         this.clinicService.saveVet(currentVet);
-        return new ResponseEntity<>(vetMapper.toVetDto(currentVet), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(vetMapper.toVetDto(currentVet), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
@@ -116,7 +109,8 @@ public class VetRestController implements VetsApi {
         if (vet == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        VetDto vetDto = vetMapper.toVetDto(vet);
         this.clinicService.deleteVet(vet);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(vetDto, HttpStatus.OK);
     }
 }

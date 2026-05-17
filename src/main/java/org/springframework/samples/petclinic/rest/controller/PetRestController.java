@@ -63,9 +63,6 @@ public class PetRestController implements PetsApi {
     @Override
     public ResponseEntity<List<PetDto>> listPets() {
         List<PetDto> pets = new ArrayList<>(petMapper.toPetsDto(this.clinicService.findAllPets()));
-        if (pets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
@@ -81,7 +78,7 @@ public class PetRestController implements PetsApi {
         currentPet.setName(petDto.getName());
         currentPet.setType(petMapper.toPetType(petDto.getType()));
         this.clinicService.savePet(currentPet);
-        return new ResponseEntity<>(petMapper.toPetDto(currentPet), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(petMapper.toPetDto(currentPet), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -91,8 +88,9 @@ public class PetRestController implements PetsApi {
         if (pet == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        PetDto petDto = petMapper.toPetDto(pet);
         this.clinicService.deletePet(pet);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(petDto, HttpStatus.OK);
     }
 
 }

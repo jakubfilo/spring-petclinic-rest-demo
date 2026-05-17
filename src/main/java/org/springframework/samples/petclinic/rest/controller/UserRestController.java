@@ -16,7 +16,6 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.mapper.UserMapper;
@@ -46,9 +45,8 @@ public class UserRestController implements UsersApi {
     @PreAuthorize( "hasRole(@roles.ADMIN)" )
     @Override
     public ResponseEntity<UserDto> addUser(UserDto userDto) {
-        HttpHeaders headers = new HttpHeaders();
         User user = userMapper.toUser(userDto);
         this.userService.saveUser(user);
-        return new ResponseEntity<>(userMapper.toUserDto(user), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(userMapper.toUserDto(user), HttpStatus.OK);
     }
 }
