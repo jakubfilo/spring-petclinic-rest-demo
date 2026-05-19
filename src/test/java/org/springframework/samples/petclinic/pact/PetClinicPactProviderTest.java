@@ -46,6 +46,8 @@ import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
  Find your JUnit test configuration
  Add environment variables:
  */
+
+// GENERATED WITH AI
 public class PetClinicPactProviderTest {
 
 	@LocalServerPort
